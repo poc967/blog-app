@@ -10,7 +10,9 @@
   "author": "Patrick O'Connor",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.5"
   },
   "devDependencies": {
     "chai": "^4.2.0",
