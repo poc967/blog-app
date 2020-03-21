@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server:dev": "./node_modules/.bin/nodemon index.js"
   },
-  "author": "",
+  "author": "Patrick O'Connor",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1"
