@@ -1,6 +1,6 @@
 const User = require('../models/users')
 
-const createUser = async (request, response, next) => {
+const createUser = async (request, response) => {
     const { firstName, lastName, email, password } = request.body
 
     if (!firstName || !lastName || !email || !password) {
@@ -51,15 +51,22 @@ const getUserById = async (request, response) => {
 }
 
 const updateUser = async (request, response) => {
+    const paramsToUpdate = request.body
+    const id = request.params.identifier
 
+    await User.findByIdAndUpdate(id, paramsToUpdate, { new: true }, function (error, newUser) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(200).json(newUser)
+        }
+    })
 }
 
 const deleteUser = async (request, response) => {
     const id = request.params.identifier
 
-    await User.findAndUpdate({
-        _id: id
-    }, {
+    await User.findByIdAndUpdate(id, {
         isDeleted: true
     }, {
         new: true
@@ -73,4 +80,4 @@ const deleteUser = async (request, response) => {
         })
 }
 
-module.exports = { createUser, getUsers, getUserById, deleteUser }
+module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser }
