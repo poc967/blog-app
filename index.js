@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const usersRouter = require('./routers/users')
 const postsRouter = require('./routers/posts')
+const session = require('express-session')
 
 
 app.use(bodyParser.urlencoded({
@@ -31,6 +32,18 @@ connection.on('error', error => {
 })
 
 //-----------------------------------------------------
+
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: false
+}))
+
+app.use((request, response, next) => {
+    response.locals.currentUser = request.session._id
+
+    next()
+})
 
 app.use('/users', usersRouter)
 app.use('/posts', postsRouter)
