@@ -13,7 +13,7 @@ const PostSchema = new mongoose.Schema({
         trim: true
     },
     author: {
-        type: ObjectId,
+        type: String /* ObjectId - changed to string for testing purposes*/,
         required: true,
         trim: true,
     },

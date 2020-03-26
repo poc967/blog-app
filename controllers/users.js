@@ -37,10 +37,11 @@ const getUsers = async (request, response) => {
 const getUserById = async (request, response) => {
     const id = request.params.identifier
 
-    await User.find({
-        _id: id,
-        isDeleted: false
-    },
+    await User.findById(
+        id,
+        {
+            isDeleted: false
+        },
         function (error, user) {
             if (error) {
                 response.status(400).json(error)

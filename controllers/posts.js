@@ -9,7 +9,7 @@ const createPost = (request, response) => {
 
     const newPost = {
         title: title,
-        author: response.session.id,
+        author: 'Me' /* response.session.id - Session ID will eventually be captured during log in */,
         category: category,
         post: post
     }
@@ -23,4 +23,27 @@ const createPost = (request, response) => {
     })
 }
 
-module.exports = { createPost }
+const getPosts = (request, response) => {
+
+    Posts.find({ isDeleted: false }, function (error, posts) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(200).json(posts)
+        }
+    })
+}
+
+const getPostById = (request, response) => {
+    const id = request.params.identifier
+
+    Posts.findById(id, { isDeleted: false }, function (error, post) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(200).json(post)
+        }
+    })
+}
+
+module.exports = { createPost, getPosts, getPostById }
