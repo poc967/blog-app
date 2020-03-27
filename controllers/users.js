@@ -37,9 +37,9 @@ const getUsers = async (request, response) => {
 const getUserById = async (request, response) => {
     const id = request.params.identifier
 
-    await User.findById(
-        id,
+    await User.findOne(
         {
+            _id: id,
             isDeleted: false
         },
         function (error, user) {
@@ -55,7 +55,7 @@ const updateUser = async (request, response) => {
     const paramsToUpdate = request.body
     const id = request.params.identifier
 
-    await User.findByIdAndUpdate(id, paramsToUpdate, { new: true }, function (error, newUser) {
+    await User.findOneAndUpdate({ _id: id, isDeleted: false }, paramsToUpdate, { new: true }, function (error, newUser) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -67,7 +67,8 @@ const updateUser = async (request, response) => {
 const deleteUser = async (request, response) => {
     const id = request.params.identifier
 
-    await User.findByIdAndUpdate(id, {
+    await User.findOneAndUpdate({
+        _id: id,
         isDeleted: true
     }, {
         new: true

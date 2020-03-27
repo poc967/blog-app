@@ -37,7 +37,7 @@ const getPosts = (request, response) => {
 const getPostById = (request, response) => {
     const id = request.params.identifier
 
-    Posts.findById(id, { isDeleted: false }, function (error, post) {
+    Posts.findOne({ _id: id, isDeleted: false }, function (error, post) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -46,4 +46,29 @@ const getPostById = (request, response) => {
     })
 }
 
-module.exports = { createPost, getPosts, getPostById }
+const editPost = (request, response) => {
+    const { title, category, post } = request.body
+    const id = request.params.identifier
+
+    Posts.findOneAndUpdate({ _id: id, isDeleted: false }, { title: title, category: category, post: post }, { new: true }, function (error, newPost) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(200).json(newPost)
+        }
+    })
+}
+
+const deletePost = (request, response) => {
+    const id = request.params.identifier
+
+    Posts.findByIdAndUpdate(id, { isDeleted: true }, { new: true }, function (error, deletedPost) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(200).json(deletedPost)
+        }
+    })
+}
+
+module.exports = { createPost, getPosts, getPostById, editPost, deletePost }
