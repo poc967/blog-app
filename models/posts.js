@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const ObjectId = require('mongoose').ObjectId
 
 const PostSchema = new mongoose.Schema({
     title: {
@@ -12,7 +13,7 @@ const PostSchema = new mongoose.Schema({
         trim: true
     },
     author: {
-        type: ObjectId,
+        type: String /* ObjectId - changed to string for testing purposes*/,
         required: true,
         trim: true,
     },
@@ -20,6 +21,10 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
