@@ -14,7 +14,7 @@ const createUser = async (request, response) => {
         password: password
     }
 
-    User.create(userData, function (error, user) {
+    await User.create(userData, function (error, user) {
         if (error) {
             return response.status(400).json(error)
         } else {

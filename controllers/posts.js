@@ -1,20 +1,20 @@
 const Posts = require('../models/posts')
 
-const createPost = (request, response) => {
-    const { title, category, post } = request.body
+const createPost = async (request, response) => {
+    const { title, category, post, author } = request.body
 
-    if (!title || !category || !post) {
+    if (!title || !category || !post || !author) {
         return response.status(400).json('All fields required: title, category, post')
     }
 
     const newPost = {
         title: title,
-        author: 'Me' /* response.session.id - Session ID will eventually be captured during log in */,
+        author: author /* response.session.id - Session ID will eventually be captured during log in */,
         category: category,
         post: post
     }
 
-    Posts.create(newPost, function (error, newPost) {
+    await Posts.create(newPost, function (error, newPost) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -23,9 +23,9 @@ const createPost = (request, response) => {
     })
 }
 
-const getPosts = (request, response) => {
+const getPosts = async (request, response) => {
 
-    Posts.find({ isDeleted: false }, function (error, posts) {
+    await Posts.find({ isDeleted: false }, function (error, posts) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -34,10 +34,10 @@ const getPosts = (request, response) => {
     })
 }
 
-const getPostById = (request, response) => {
+const getPostById = async (request, response) => {
     const id = request.params.identifier
 
-    Posts.findOne({ _id: id, isDeleted: false }, function (error, post) {
+    await Posts.findOne({ _id: id, isDeleted: false }, function (error, post) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -46,11 +46,11 @@ const getPostById = (request, response) => {
     })
 }
 
-const editPost = (request, response) => {
+const editPost = async (request, response) => {
     const { title, category, post } = request.body
     const id = request.params.identifier
 
-    Posts.findOneAndUpdate({ _id: id, isDeleted: false }, { title: title, category: category, post: post }, { new: true }, function (error, newPost) {
+    await Posts.findOneAndUpdate({ _id: id, isDeleted: false }, { title: title, category: category, post: post }, { new: true }, function (error, newPost) {
         if (error) {
             return response.status(400).json(error)
         } else {
@@ -59,10 +59,10 @@ const editPost = (request, response) => {
     })
 }
 
-const deletePost = (request, response) => {
+const deletePost = async (request, response) => {
     const id = request.params.identifier
 
-    Posts.findByIdAndUpdate(id, { isDeleted: true }, { new: true }, function (error, deletedPost) {
+    await Posts.findByIdAndUpdate(id, { isDeleted: true }, { new: true }, function (error, deletedPost) {
         if (error) {
             return response.status(400).json(error)
         } else {

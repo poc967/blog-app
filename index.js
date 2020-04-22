@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const usersRouter = require('./routers/users')
 const postsRouter = require('./routers/posts')
 const session = require('express-session')
-
+const cors = require('cors')
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -33,6 +33,7 @@ connection.on('error', error => {
 
 //-----------------------------------------------------
 
+app.use(cors())
 app.use(session({
     secret: 'secret',
     resave: true,
