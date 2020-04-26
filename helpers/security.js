@@ -1,50 +1,69 @@
-const auth = require('basic-auth')
-const bcrypt = require('bcryptjs')
 const User = require('../models/users')
-
-const hashPassword = (password) => {
-    return bcrypt.hashSync(password, 10)
-}
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const authenticateUser = async (request, response, next) => {
-    let message = null
+    const { email, password } = request.body
 
-    const credentials = auth(request)
-
-    if (credentials) {
-        console.log(credentials.username)
-        const user = await User.findOne(
-            {
-                email: credentials.username
-            }
-        )
-
-        if (user) {
-            const match = await bcrypt.compare(credentials.password, user.password)
-
-            if (match) {
-                console.log(`Authentication successful for username: ${user.username}`)
-
-                request.currentUser = user
-                return response.redirect('/')
-            } else {
-                message = `Authentication failure for username: ${user.email}`
-            }
-
-        } else {
-            message = `User not found for username: ${credentials.username}`
-        }
-
-    } else {
-        message = 'Auth header not found'
+    if (!email || !password) {
+        return response.status(400).json({ message: 'All fields required' })
     }
 
-    if (message) {
-        console.warn(message)
-        return response.status(301).json({ message: 'Access Denied' })
+    await User.findOne({ email }, async function (err, user) {
+        if (!user) {
+            return response.status(400).json({ message: 'user does not exist' })
+        } else {
+            const isMatch = await bcrypt.compare(password, user.password)
+
+            if (!isMatch) {
+                return response.status(400).json({ message: 'invalid credentials' })
+            } else {
+                jwt.sign(
+                    { id: user.id },
+                    process.env.jwtSecret,
+                    { expiresIn: 3600 },
+                    (err, token) => {
+                        if (err) throw err
+                        return response.json({
+                            token,
+                            user: {
+                                id: user.id,
+                                email: user.email,
+                                firstName: user.firstName
+                            }
+                        })
+                    }
+                )
+            }
+        }
+    })
+}
+
+const authorizeUser = (request, response, next) => {
+    const header = request.header('Authorization')
+    const bearer = header.split(' ');
+    const token = bearer[1];
+    console.log(token)
+
+    if (!token) {
+        return response.status(400).json({ message: 'no token found, authorization denied' })
     } else {
-        next()
+        try {
+            const decodedToken = jwt.verify(token, process.env.jwtSecret)
+            request.user = decodedToken
+            next()
+        } catch (e) {
+            return response.status(401).json({ message: 'bad token' })
+        }
     }
 }
 
-module.exports = authenticateUser
+const getUserFromToken = async (request, response) => {
+    const currentUser = await User.findById(request.user.id)
+        .select('-password')
+
+    return response.json(currentUser)
+}
+
+module.exports = { authorizeUser, authenticateUser, getUserFromToken }

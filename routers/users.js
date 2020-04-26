@@ -1,6 +1,6 @@
 const express = require('express')
 const usersRouter = express.Router()
-const authenticateUser = require('../helpers/security')
+const { authenticateUser, getUserFromToken, authorizeUser } = require('../helpers/security')
 const { createUser, getUsers, getUserById, updateUser, deleteUser } = require('../controllers/users')
 
 usersRouter.post('/', createUser)
