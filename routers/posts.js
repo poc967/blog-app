@@ -5,8 +5,11 @@ const { createPost, getPosts, getPostById, editPost, deletePost } = require('../
 
 postsRouter.get('/', getPosts)
 postsRouter.get('/:identifier', getPostById)
-postsRouter.post('/', authorizeUser, createPost)
+// postsRouter.post('/', authorizeUser, createPost)
+postsRouter.post('/', createPost)
+
 postsRouter.patch('/:identifier', authorizeUser, editPost)
-postsRouter.delete('/:identifier', authorizeUser, deletePost)
+// postsRouter.delete('/:identifier', authorizeUser, deletePost)
+postsRouter.delete('/:identifier', deletePost)
 
 module.exports = postsRouter

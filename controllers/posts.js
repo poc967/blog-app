@@ -1,21 +1,22 @@
 const Posts = require('../models/posts')
 
 const createPost = async (request, response) => {
-    const { title, category, post, author } = request.body
+    const { title, category, body, author } = request.body
 
-    if (!title || !category || !post || !author) {
-        return response.status(400).json('All fields required: title, category, post')
+    if (!title || !category || !body || !author) {
+        return response.status(400).json('All fields required: title, category, body')
     }
 
     const newPost = {
         title: title,
         author: author /* response.session.id - Session ID will eventually be captured during log in */,
         category: category,
-        post: post
+        body: body
     }
 
     await Posts.create(newPost, function (error, newPost) {
         if (error) {
+            console.log(error)
             return response.status(400).json(error)
         } else {
             return response.status(201).json(newPost)
@@ -47,10 +48,10 @@ const getPostById = async (request, response) => {
 }
 
 const editPost = async (request, response) => {
-    const { title, category, post } = request.body
+    const { title, category, body } = request.body
     const id = request.params.identifier
 
-    await Posts.findOneAndUpdate({ _id: id, isDeleted: false }, { title: title, category: category, post: post }, { new: true }, function (error, newPost) {
+    await Posts.findOneAndUpdate({ _id: id, isDeleted: false }, { title, category, body }, { new: true }, function (error, newPost) {
         if (error) {
             return response.status(400).json(error)
         } else {
