@@ -1,4 +1,5 @@
 const Posts = require('../models/posts')
+const { parseCategoriesToArray } = require('../helpers/cleaners')
 
 const createPost = async (request, response) => {
     const { title, category, body, author } = request.body
@@ -47,6 +48,24 @@ const getPostById = async (request, response) => {
     })
 }
 
+const getPostByCategory = async (request, response) => {
+    const category = request.params.category
+
+    if (!category) {
+        return response.status(400).json('Please provide a category')
+    }
+
+    const parsedCategories = parseCategoriesToArray(category)
+
+    await Posts.find({ isDeleted: false, category: { $in: parsedCategories } }, function (error, posts) {
+        if (error) {
+            return response.status(400).json(error)
+        } else {
+            return response.status(201).json(posts)
+        }
+    })
+}
+
 const editPost = async (request, response) => {
     const { title, category, body } = request.body
     const id = request.params.identifier
@@ -72,4 +91,4 @@ const deletePost = async (request, response) => {
     })
 }
 
-module.exports = { createPost, getPosts, getPostById, editPost, deletePost }
+module.exports = { createPost, getPosts, getPostById, getPostByCategory, editPost, deletePost }
