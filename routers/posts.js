@@ -1,10 +1,11 @@
 const express = require('express')
 const postsRouter = express.Router()
 const { authorizeUser } = require('../helpers/security')
-const { createPost, getPosts, getPostById, editPost, deletePost } = require('../controllers/posts')
+const { createPost, getPosts, getPostById, getPostByCategory, editPost, deletePost } = require('../controllers/posts')
 
 postsRouter.get('/', getPosts)
 postsRouter.get('/:identifier', getPostById)
+postsRouter.get('/category/:category', getPostByCategory)
 // postsRouter.post('/', authorizeUser, createPost)
 postsRouter.post('/', createPost)
 
