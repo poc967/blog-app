@@ -4,7 +4,7 @@ const { authenticateUser, getUserFromToken, authorizeUser } = require('../helper
 const { createUser, getUsers, getUserById, updateUser, deleteUser } = require('../controllers/users')
 
 usersRouter.post('/', createUser)
-usersRouter.get('/', getUsers)
+usersRouter.get('/', authorizeUser, getUserFromToken)
 usersRouter.get('/:identifier', getUserById)
 usersRouter.delete('/:identifier', deleteUser)
 usersRouter.patch('/:identifier', updateUser)

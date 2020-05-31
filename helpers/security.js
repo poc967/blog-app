@@ -41,13 +41,10 @@ const authenticateUser = async (request, response, next) => {
 }
 
 const authorizeUser = (request, response, next) => {
-    const header = request.header('Authorization')
-    const bearer = header.split(' ');
-    const token = bearer[1];
-    console.log(token)
+    const token = request.header('x-auth-token')
 
     if (!token) {
-        return response.status(400).json({ message: 'no token found, authorization denied' })
+        return response.status(401).json({ message: 'no token found, authorization denied' })
     } else {
         try {
             const decodedToken = jwt.verify(token, process.env.jwtSecret)
@@ -60,10 +57,15 @@ const authorizeUser = (request, response, next) => {
 }
 
 const getUserFromToken = async (request, response) => {
-    const currentUser = await User.findById(request.user.id)
-        .select('-password')
-
-    return response.json(currentUser)
+    console.log(request.user)
+    try {
+        const currentUser = await User.findById(request.user.id).select('-password')
+        if (!currentUser) throw new Error('user does not exist')
+        return response.status(201).json(currentUser)
+    } catch (error) {
+        console.log(error)
+        return response.status(400).json(error)
+    }
 }
 
 module.exports = { authorizeUser, authenticateUser, getUserFromToken }
