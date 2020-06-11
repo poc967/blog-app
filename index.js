@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const usersRouter = require('./routers/users')
 const postsRouter = require('./routers/posts')
 const session = require('express-session')
+const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 app.use(bodyParser.urlencoded({
@@ -40,6 +41,7 @@ app.use(session({
     resave: true,
     saveUninitialized: false
 }))
+app.use(cookieParser())
 
 app.use((request, response, next) => {
     response.locals.currentUser = request.session._id

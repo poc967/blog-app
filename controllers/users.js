@@ -38,13 +38,14 @@ const createUser = async (request, response) => {
                         { expiresIn: 3600 },
                         (err, token) => {
                             if (err) throw err
-                            return response.json({
+                            return response.cookie(
+                                'token',
                                 token,
-                                user: {
-                                    id: userData.id,
-                                    email: userData.email,
-                                    firstName: userData.firstName
-                                }
+                                { httpOnly: true }
+                            ).json({
+                                id: userData.id,
+                                email: userData.email,
+                                firstName: userData.firstName
                             })
                         }
                     )

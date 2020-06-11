@@ -9,10 +9,10 @@ const createPost = async (request, response) => {
     }
 
     const newPost = {
-        title: title,
-        author: author /* response.session.id - Session ID will eventually be captured during log in */,
-        category: category,
-        body: body
+        title,
+        author,
+        category,
+        body
     }
 
     await Posts.create(newPost, function (error, newPost) {

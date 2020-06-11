@@ -25,13 +25,14 @@ const authenticateUser = async (request, response, next) => {
                     { expiresIn: 3600 },
                     (err, token) => {
                         if (err) throw err
-                        return response.json({
+                        return response.cookie(
+                            'token',
                             token,
-                            user: {
-                                id: user.id,
-                                email: user.email,
-                                firstName: user.firstName
-                            }
+                            { httpOnly: true }
+                        ).json({
+                            id: user.id,
+                            email: user.email,
+                            firstName: user.firstName
                         })
                     }
                 )
@@ -41,7 +42,7 @@ const authenticateUser = async (request, response, next) => {
 }
 
 const authorizeUser = (request, response, next) => {
-    const token = request.header('x-auth-token')
+    const token = request.cookies.token
 
     if (!token) {
         return response.status(401).json({ message: 'no token found, authorization denied' })
@@ -51,21 +52,30 @@ const authorizeUser = (request, response, next) => {
             request.user = decodedToken
             next()
         } catch (e) {
-            return response.status(401).json({ message: 'bad token' })
+            return response.clearCookie('token').status(401).json({ message: 'bad token' })
         }
     }
 }
 
+const clearToken = (request, response) => {
+    const token = request.cookies.token
+
+    if (token) {
+        return response.clearCookie('token').status(200).json({ message: 'token cleared successfully' })
+    } else {
+        return response.status(400).json({ message: 'no token found' })
+    }
+}
+
 const getUserFromToken = async (request, response) => {
-    console.log(request.user)
     try {
         const currentUser = await User.findById(request.user.id).select('-password')
         if (!currentUser) throw new Error('user does not exist')
-        return response.status(201).json(currentUser)
+        const { _id, email, firstName } = currentUser
+        return response.status(201).send({ _id, email, firstName })
     } catch (error) {
-        console.log(error)
         return response.status(400).json(error)
     }
 }
 
-module.exports = { authorizeUser, authenticateUser, getUserFromToken }
+module.exports = { authorizeUser, authenticateUser, getUserFromToken, clearToken }
