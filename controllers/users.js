@@ -42,7 +42,7 @@ const createUser = async (request, response) => {
                                 token,
                                 { httpOnly: true }
                             ).json({
-                                id: userData.id,
+                                _id: userData.id,
                                 email: userData.email,
                                 firstName: userData.firstName
                             })
