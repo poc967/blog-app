@@ -30,7 +30,7 @@ const authenticateUser = async (request, response, next) => {
                             token,
                             { httpOnly: true }
                         ).json({
-                            id: user.id,
+                            _id: user.id,
                             email: user.email,
                             firstName: user.firstName
                         })
