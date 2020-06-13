@@ -5,7 +5,6 @@ require('dotenv').config()
 
 const createUser = async (request, response) => {
     const { firstName, lastName, email, password } = request.body
-    console.log(request)
 
     // validate all fields are provided
     if (!firstName || !lastName || !email || !password) {

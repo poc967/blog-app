@@ -15,19 +15,19 @@ const createPost = async (request, response) => {
         body
     }
 
-    await Posts.create(newPost, function (error, newPost) {
+    await Posts.create(newPost, async function (error, newPost) {
         if (error) {
             console.log(error)
             return response.status(400).json(error)
         } else {
-            return response.status(201).json(newPost)
+            const updatedNewPost = await Posts.populate(newPost, { path: 'author', model: 'User' })
+            return response.status(201).json(updatedNewPost)
         }
     })
 }
 
 const getPosts = async (request, response) => {
-
-    await Posts.find({ isDeleted: false }, function (error, posts) {
+    await Posts.find({ isDeleted: false }).populate('author').exec(function (error, posts) {
         if (error) {
             return response.status(400).json(error)
         } else {
