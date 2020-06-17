@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const createUser = async (request, response) => {
+const createUser = async (request, response, next) => {
     const { firstName, lastName, email, password } = request.body
 
     // validate all fields are provided
@@ -24,11 +24,14 @@ const createUser = async (request, response) => {
             })
 
             // create the salt, hash the password and then update the user in the database
-            bcrypt.genSalt(10, function (err, salt) {
-                bcrypt.hash(userData.password, salt, function (err, hash) {
+            bcrypt.genSalt(10, async function (err, salt) {
+                bcrypt.hash(userData.password, salt, async function (err, hash) {
                     if (err) throw new err
                     userData.password = hash
                     userData.save()
+
+                    // grab user object and exclude the password
+                    const newUser = await User.findById(userData.id).select('-password')
 
                     // sign and deliver the jwt
                     jwt.sign(
@@ -41,11 +44,7 @@ const createUser = async (request, response) => {
                                 'token',
                                 token,
                                 { httpOnly: true }
-                            ).json({
-                                _id: userData.id,
-                                email: userData.email,
-                                firstName: userData.firstName
-                            })
+                            ).status(200).json({ message: 'success: new user added', newUser })
                         }
                     )
 
