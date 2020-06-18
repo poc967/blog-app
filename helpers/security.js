@@ -33,7 +33,7 @@ const authenticateUser = async (request, response, next) => {
                     'token',
                     token,
                     { httpOnly: true }
-                ).status(200).json({ message: 'success: user logged in', userWithNoPassword })
+                ).status(200).json(userWithNoPassword)
             }
         )
     }

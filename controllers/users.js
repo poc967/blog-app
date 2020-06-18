@@ -44,7 +44,7 @@ const createUser = async (request, response, next) => {
                                 'token',
                                 token,
                                 { httpOnly: true }
-                            ).status(200).json({ message: 'success: new user added', newUser })
+                            ).status(200).json(newUser)
                         }
                     )
 
@@ -86,13 +86,13 @@ const updateUser = async (request, response) => {
     const paramsToUpdate = request.body
     const id = request.params.identifier
 
-    await User.findOneAndUpdate({ _id: id, isDeleted: false }, paramsToUpdate, { new: true }, function (error, newUser) {
-        if (error) {
-            return response.status(400).json(error)
-        } else {
-            return response.status(200).json(newUser)
-        }
-    })
+    try {
+        const user = await User.findOneAndUpdate({ _id: id, isDeleted: false }, paramsToUpdate, { new: true }).select('-password')
+        if (error) throw new Error(error)
+        return response.status(200).json(user)
+    } catch (error) {
+        return response.status(400).json(error)
+    }
 }
 
 const deleteUser = async (request, response) => {

@@ -7,7 +7,7 @@ usersRouter.post('/', createUser, getUserFromToken)
 usersRouter.get('/', authorizeUser, getUserFromToken)
 usersRouter.get('/:identifier', getUserById)
 usersRouter.delete('/:identifier', deleteUser)
-usersRouter.patch('/:identifier', updateUser)
+usersRouter.patch('/:identifier', authorizeUser, updateUser)
 usersRouter.post('/login', authenticateUser, getUserFromToken)
 usersRouter.post('/logout', clearToken)
 
