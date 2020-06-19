@@ -88,7 +88,7 @@ const updateUser = async (request, response) => {
 
     try {
         const user = await User.findOneAndUpdate({ _id: id, isDeleted: false }, paramsToUpdate, { new: true }).select('-password')
-        if (error) throw new Error(error)
+        if (!user) throw new Error(error)
         return response.status(200).json(user)
     } catch (error) {
         return response.status(400).json(error)
