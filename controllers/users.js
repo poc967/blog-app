@@ -1,6 +1,8 @@
 const User = require('../models/users')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { param } = require('../routers/users')
+const { findById } = require('../models/users')
 require('dotenv').config()
 
 const createUser = async (request, response, next) => {
@@ -83,13 +85,26 @@ const getUserById = async (request, response) => {
 }
 
 const updateUser = async (request, response) => {
-    const paramsToUpdate = request.body
-    const id = request.params.identifier
+    const key = Object.keys(request.body)
+    const user = await User.findOne({ _id: request.params.identifier, isDeleted: false })
 
     try {
-        const user = await User.findOneAndUpdate({ _id: id, isDeleted: false }, paramsToUpdate, { new: true }).select('-password')
-        if (!user) throw new Error(error)
-        return response.status(200).json(user)
+        if (key.includes('password')) {
+            bcrypt.genSalt(10, async function (err, salt) {
+                bcrypt.hash(request.body.password, salt, async function (error, hash) {
+                    if (error) throw new error
+                    user.password = hash
+                    user.save()
+                    return response.status(200).json(user)
+                })
+            })
+        } else {
+            user[key] = request.body[key]
+            user.save()
+            return response.status(200).json(user)
+        }
+
+        // could use some better error handling here, add that to techdebt
     } catch (error) {
         return response.status(400).json(error)
     }
