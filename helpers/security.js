@@ -10,35 +10,33 @@ const authenticateUser = async (request, response, next) => {
         return response.status(400).json({ message: 'All fields required' })
     }
 
-    await User.findOne({ email }, async function (err, user) {
-        if (!user) {
-            return response.status(400).json({ message: 'user does not exist' })
-        } else {
-            const isMatch = await bcrypt.compare(password, user.password)
+    const user = await User.findOne({ email })
 
-            if (!isMatch) {
-                return response.status(400).json({ message: 'invalid credentials' })
-            } else {
-                jwt.sign(
-                    { id: user.id },
-                    process.env.jwtSecret,
-                    { expiresIn: 3600 },
-                    (err, token) => {
-                        if (err) throw err
-                        return response.cookie(
-                            'token',
-                            token,
-                            { httpOnly: true }
-                        ).json({
-                            _id: user.id,
-                            email: user.email,
-                            firstName: user.firstName
-                        })
-                    }
-                )
+    if (!user) {
+        return response.status(400).json({ message: 'user does not exist' })
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        return response.status(400).json({ message: 'invalid credentials' })
+    } else {
+        const userWithNoPassword = await User.findById(user.id).select('-password')
+
+        jwt.sign(
+            { id: user.id },
+            process.env.jwtSecret,
+            { expiresIn: 3600 },
+            (err, token) => {
+                if (err) throw err
+                return response.cookie(
+                    'token',
+                    token,
+                    { httpOnly: true }
+                ).status(200).json(userWithNoPassword)
             }
-        }
-    })
+        )
+    }
 }
 
 const authorizeUser = (request, response, next) => {
@@ -71,8 +69,7 @@ const getUserFromToken = async (request, response) => {
     try {
         const currentUser = await User.findById(request.user.id).select('-password')
         if (!currentUser) throw new Error('user does not exist')
-        const { _id, email, firstName } = currentUser
-        return response.status(201).send({ _id, email, firstName })
+        return response.status(201).send(currentUser)
     } catch (error) {
         return response.status(400).json(error)
     }
