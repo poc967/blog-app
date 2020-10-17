@@ -7,7 +7,6 @@ require("dotenv").config();
 
 const createUser = async (request, response, next) => {
   const { firstName, lastName, email, password } = request.body;
-  console.log(request.body);
 
   // validate all fields are provided
   if (!firstName || !lastName || !email || !password) {
@@ -113,7 +112,6 @@ const updateUser = async (request, response) => {
 };
 
 const deleteUser = async (request, response) => {
-  console.log(request.params);
   const id = request.params.identifier;
 
   await User.deleteOne(

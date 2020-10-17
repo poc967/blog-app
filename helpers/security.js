@@ -73,7 +73,6 @@ const clearToken = (request, response) => {
 };
 
 const getUserFromToken = async (request, response) => {
-  console.log("getting user from token now");
   try {
     const currentUser = await User.findById(request.user.id).select(
       "-password"
