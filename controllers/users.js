@@ -34,9 +34,9 @@ const createUser = async (request, response, next) => {
           userData.save();
 
           // grab user object and exclude the password
-          console.log(userData.id);
-          const newUser = await User.findById(userData.id).select("-password");
-          console.log(newUser);
+          // console.log(userData.id);
+          // const newUser = await User.findById(userData.id).select("-password");
+          // console.log(newUser);
 
           // sign and deliver the jwt
           jwt.sign(
@@ -48,7 +48,7 @@ const createUser = async (request, response, next) => {
               return response
                 .cookie("token", token, { httpOnly: true })
                 .status(200)
-                .json(newUser);
+                .json(userData);
             }
           );
         });
@@ -73,7 +73,6 @@ const getUserById = async (request, response) => {
   await User.findOne(
     {
       _id: id,
-      isDeleted: false,
     },
     function (error, user) {
       if (error) {
@@ -89,7 +88,6 @@ const updateUser = async (request, response) => {
   const key = Object.keys(request.body);
   const user = await User.findOne({
     _id: request.params.identifier,
-    isDeleted: false,
   });
 
   try {
@@ -115,16 +113,15 @@ const updateUser = async (request, response) => {
 };
 
 const deleteUser = async (request, response) => {
+  console.log(request.params);
   const id = request.params.identifier;
 
-  await User.findOneAndUpdate(
-    {
-      _id: id,
-      isDeleted: true,
-    },
+  await User.deleteOne(
+    { _id: id },
     {
       new: true,
     },
+    // you can delete users now but you can still log in as them lol
     function (error, userToDelete) {
       if (error) {
         return response.status(400).json(error);
