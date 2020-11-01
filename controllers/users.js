@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { param } = require("../routers/users");
 const { findById } = require("../models/users");
+const { request, response } = require("express");
 require("dotenv").config();
 
 const createUser = async (request, response, next) => {
@@ -130,4 +131,46 @@ const deleteUser = async (request, response) => {
   );
 };
 
-module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser };
+const userSearch = async (request, response) => {
+  const searchString = request.body;
+
+  await User.find(
+    {
+      firstName: searchString.firstName,
+    },
+    function (error, results) {
+      if (error) {
+        return response.status(400).json(error);
+      } else {
+        return response.status(200).json(results);
+      }
+    }
+  );
+};
+
+const addUserFollowers = async (request, response) => {
+  const id = request.body.id;
+  const followedUser = request.body.followedUser;
+
+  await User.find(
+    {
+      id,
+    },
+    function (error, user) {
+      if (error) {
+        return response.status(400).json(error);
+      } else {
+        user[followedAccounts].push(followedUser);
+      }
+    }
+  );
+};
+
+module.exports = {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  userSearch,
+};
