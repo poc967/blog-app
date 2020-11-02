@@ -13,6 +13,7 @@ const {
   updateUser,
   deleteUser,
   userSearch,
+  addUserFollowers,
 } = require("../controllers/users");
 
 usersRouter.post("/", createUser, getUserFromToken);
@@ -23,5 +24,6 @@ usersRouter.patch("/:identifier", authorizeUser, updateUser);
 usersRouter.post("/login", authenticateUser, getUserFromToken);
 usersRouter.post("/logout", clearToken);
 usersRouter.post("/search", authorizeUser, userSearch);
+usersRouter.post("/add_followers/:identifier", authorizeUser, addUserFollowers);
 
 module.exports = usersRouter;

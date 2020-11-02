@@ -149,18 +149,26 @@ const userSearch = async (request, response) => {
 };
 
 const addUserFollowers = async (request, response) => {
-  const id = request.body.id;
-  const followedUser = request.body.followedUser;
+  const currentUser = request.params.identifier;
+  const userToFollow = request.body.userToFollow;
 
-  await User.find(
+  await User.findOne(
     {
-      id,
+      _id: currentUser,
     },
     function (error, user) {
       if (error) {
         return response.status(400).json(error);
       } else {
-        user[followedAccounts].push(followedUser);
+        if (!user.followedAccounts.includes(userToFollow)) {
+          user["followedAccounts"].push(userToFollow);
+          user.save();
+          return response
+            .status(200)
+            .json(
+              `User ${userToFollow} added successfully to ${currentUser}'s follower list`
+            );
+        }
       }
     }
   );
@@ -173,4 +181,5 @@ module.exports = {
   updateUser,
   deleteUser,
   userSearch,
+  addUserFollowers,
 };
