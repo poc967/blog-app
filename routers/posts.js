@@ -10,13 +10,13 @@ const {
   deletePost,
   deleteAllPostsByUser,
 } = require("../controllers/posts");
+const { getUserFollowers } = require("../controllers/users");
 
-postsRouter.get("/", getPosts);
+postsRouter.get("/", authorizeUser, getUserFollowers, getPosts);
 postsRouter.get("/:identifier", getPostById);
 postsRouter.get("/category/:category", getPostByCategory);
-// postsRouter.post('/', authorizeUser, createPost)
-postsRouter.post("/", createPost);
-
+postsRouter.post("/", authorizeUser, createPost);
+// postsRouter.post("/", createPost);
 postsRouter.patch("/:identifier", authorizeUser, editPost);
 // postsRouter.delete('/:identifier', authorizeUser, deletePost)
 postsRouter.delete("/:identifier", deletePost);

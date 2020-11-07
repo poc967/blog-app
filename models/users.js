@@ -21,15 +21,12 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    followedAccounts: [mongoose.Schema.Types.ObjectId],
     password: {
       type: String,
       required: true,
       trim: true,
     },
-    // isDeleted: {
-    //   type: Boolean,
-    //   default: false,
-    // },
   },
   {
     timestamps: true,

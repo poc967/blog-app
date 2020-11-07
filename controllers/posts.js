@@ -1,5 +1,6 @@
 const Posts = require("../models/posts");
 const { parseCategoriesToArray } = require("../helpers/cleaners");
+const { getUserFollowers } = require("../controllers/users");
 
 const createPost = async (request, response) => {
   const { title, category, body, author } = request.body;
@@ -32,7 +33,12 @@ const createPost = async (request, response) => {
 };
 
 const getPosts = async (request, response) => {
-  await Posts.find({ isDeleted: false })
+  const accounts = request.followedAccounts;
+  accounts.push(request.user.id);
+  await Posts.find({
+    isDeleted: false,
+    author: { $in: accounts },
+  })
     .populate("author")
     .exec(function (error, posts) {
       if (error) {
