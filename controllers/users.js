@@ -160,15 +160,34 @@ const addUserFollowers = async (request, response) => {
       if (error) {
         return response.status(400).json(error);
       } else {
-        if (!user.followedAccounts.includes(userToFollow)) {
+        if (
+          !user.followedAccounts.includes(userToFollow) &&
+          currentUser !== userToFollow
+        ) {
           user["followedAccounts"].push(userToFollow);
           user.save();
-          return response
-            .status(200)
-            .json(
-              `User ${userToFollow} added successfully to ${currentUser}'s follower list`
-            );
+          return response.status(200).json({
+            message: `User ${userToFollow} added successfully to ${currentUser}'s follower list`,
+            user,
+            status: 200,
+          });
         }
+      }
+    }
+  );
+};
+
+const getUserFollowers = async (request, response, next) => {
+  await User.findOne(
+    {
+      _id: request.user.id,
+    },
+    function (error, user) {
+      if (error) {
+        console.log(error);
+      } else {
+        request.followedAccounts = user.followedAccounts;
+        next();
       }
     }
   );
@@ -182,4 +201,5 @@ module.exports = {
   deleteUser,
   userSearch,
   addUserFollowers,
+  getUserFollowers,
 };

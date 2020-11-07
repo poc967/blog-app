@@ -49,6 +49,7 @@ const authorizeUser = (request, response, next) => {
     try {
       const decodedToken = jwt.verify(token, process.env.jwtSecret);
       request.user = decodedToken;
+      // return response.status(200);
       next();
     } catch (e) {
       return response
