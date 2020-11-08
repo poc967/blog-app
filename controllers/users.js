@@ -156,7 +156,7 @@ const addUserFollowers = async (request, response) => {
     {
       _id: currentUser,
     },
-    function (error, user) {
+    async function (error, user) {
       if (error) {
         return response.status(400).json(error);
       } else {
@@ -166,10 +166,15 @@ const addUserFollowers = async (request, response) => {
         ) {
           user["followedAccounts"].push(userToFollow);
           user.save();
+          await user
+            .populate({
+              path: "followedAccounts",
+              select: ["firstName", "lastName"],
+            })
+            .execPopulate();
           return response.status(200).json({
             message: `User ${userToFollow} added successfully to ${currentUser}'s follower list`,
             user,
-            status: 200,
           });
         }
       }

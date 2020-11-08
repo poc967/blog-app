@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    followedAccounts: [mongoose.Schema.Types.ObjectId],
+    followedAccounts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     password: {
       type: String,
       required: true,
