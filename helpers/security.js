@@ -39,32 +39,38 @@ const authenticateUser = async (request, response, next) => {
 
   //fix so we do not send password
 
-  await User.findOne({ email })
-    .populate({ path: "followedAccounts", select: ["firstName", "lastName"] })
-    .exec(async function (error, user) {
-      if (error || !user) {
-        return response.status(400).json("user does not exist");
-      } else {
-        const isMatch = await bcrypt.compare(password, user.password);
+  await User.findOne({ email }, async function (error, user) {
+    if (error || !user) {
+      return response.status(400).json("user does not exist");
+    } else {
+      const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!isMatch) {
-          return response.status(400).json({ message: "invalid credentials" });
-        } else {
-          jwt.sign(
-            { id: user.id },
-            process.env.jwtSecret,
-            { expiresIn: 3600 },
-            (err, token) => {
-              if (err) throw err;
-              return response
-                .cookie("token", token, { httpOnly: true })
-                .status(200)
-                .json(user);
-            }
-          );
-        }
+      if (!isMatch) {
+        return response.status(400).json({ message: "invalid credentials" });
+      } else {
+        jwt.sign(
+          { id: user.id },
+          process.env.jwtSecret,
+          { expiresIn: 3600 },
+          async (err, token) => {
+            if (err) throw err;
+            return response
+              .cookie("token", token, { httpOnly: true })
+              .status(200)
+              .json(
+                await User.findOne({ _id: user._id })
+                  .select("-password")
+                  .populate({
+                    path: "followedAccounts",
+                    select: ["firstName", "lastName"],
+                  })
+                  .exec()
+              );
+          }
+        );
       }
-    });
+    }
+  });
 };
 
 const authorizeUser = (request, response, next) => {
