@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { param } = require("../routers/users");
 const { findById } = require("../models/users");
 const { request, response } = require("express");
+const { use } = require("chai");
 require("dotenv").config();
 
 const createUser = async (request, response, next) => {
@@ -33,22 +34,22 @@ const createUser = async (request, response, next) => {
           userData.password = hash;
           userData.save();
 
-          // grab user object and exclude the password
-          // console.log(userData.id);
-          // const newUser = await User.findById(userData.id).select("-password");
-          // console.log(newUser);
-
           // sign and deliver the jwt
           jwt.sign(
             { id: userData.id },
             process.env.jwtSecret,
             { expiresIn: 3600 },
-            (err, token) => {
+            async (err, token) => {
               if (err) throw err;
               return response
                 .cookie("token", token, { httpOnly: true })
                 .status(200)
-                .json(userData);
+                .json(
+                  userData.populate({
+                    path: "followedAccounts",
+                    select: ["firstName", "lastName"],
+                  })
+                );
             }
           );
         });
@@ -156,7 +157,7 @@ const addUserFollowers = async (request, response) => {
     {
       _id: currentUser,
     },
-    function (error, user) {
+    async function (error, user) {
       if (error) {
         return response.status(400).json(error);
       } else {
@@ -166,15 +167,46 @@ const addUserFollowers = async (request, response) => {
         ) {
           user["followedAccounts"].push(userToFollow);
           user.save();
+          await user
+            .populate({
+              path: "followedAccounts",
+              select: ["firstName", "lastName"],
+            })
+            .execPopulate();
           return response.status(200).json({
             message: `User ${userToFollow} added successfully to ${currentUser}'s follower list`,
             user,
-            status: 200,
           });
         }
       }
     }
   );
+};
+
+const deleteUserFollower = async (request, response) => {
+  const currentUser = request.params.identifier;
+  const userToUnfollow = request.body.userToUnfollow;
+
+  await User.findOne({ _id: currentUser }, async function (error, user) {
+    if (error || !user) {
+      return response.status(400).json(error);
+    } else {
+      user["followedAccounts"] = user["followedAccounts"].filter((account) => {
+        if (account._id != userToUnfollow) return true;
+      });
+      user.save();
+      await user
+        .populate({
+          path: "followedAccounts",
+          select: ["firstName", "lastName"],
+        })
+        .execPopulate();
+      return response.status(200).json({
+        message: `User ${userToUnfollow} added successfully to ${currentUser}'s follower list`,
+        user,
+      });
+    }
+  });
 };
 
 const getUserFollowers = async (request, response, next) => {
@@ -202,4 +234,5 @@ module.exports = {
   userSearch,
   addUserFollowers,
   getUserFollowers,
+  deleteUserFollower,
 };
