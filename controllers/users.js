@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const { param } = require("../routers/users");
 const { findById } = require("../models/users");
 const { request, response } = require("express");
-const { use } = require("chai");
 require("dotenv").config();
 
 const createUser = async (request, response, next) => {
