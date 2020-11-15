@@ -87,30 +87,56 @@ const getUserById = async (request, response) => {
 
 const updateUser = async (request, response) => {
   const key = Object.keys(request.body);
-  const user = await User.findOne({
-    _id: request.params.identifier,
-  });
-
-  try {
-    if (key.includes("password")) {
-      bcrypt.genSalt(10, async function (err, salt) {
-        bcrypt.hash(request.body.password, salt, async function (error, hash) {
-          if (error) throw new error();
-          user.password = hash;
-          user.save();
-          return response.status(200).json(user);
+  await User.findOne(
+    {
+      _id: request.params.identifier,
+    },
+    function (error, user) {
+      if (key.includes("password")) {
+        bcrypt.genSalt(10, async function (err, salt) {
+          bcrypt.hash(request.body.password, salt, async function (
+            error,
+            hash
+          ) {
+            if (error) throw new error();
+            user.password = hash;
+            user.save();
+            return response.status(200);
+          });
         });
-      });
-    } else {
-      user[key] = request.body[key];
-      user.save();
-      return response.status(200).json(user);
+      } else {
+        user[key] = request.body[key];
+        user.save(function (error, user) {
+          if (error) {
+            return response.status(400).json(error);
+          } else {
+            return response.status(200).json({ [key]: user[key] });
+          }
+        });
+      }
     }
+  );
 
-    // could use some better error handling here, add that to techdebt
-  } catch (error) {
-    return response.status(400).json(error);
-  }
+  // try {
+  //   if (key.includes("password")) {
+  //     bcrypt.genSalt(10, async function (err, salt) {
+  //       bcrypt.hash(request.body.password, salt, async function (error, hash) {
+  //         if (error) throw new error();
+  //         user.password = hash;
+  //         user.save();
+  //         return response.status(200);
+  //       });
+  //     });
+  //   } else {
+  //     user[key] = request.body[key];
+  //     user.save();
+  //     return response.status(200).json({ [key]: user[key] });
+  //   }
+  //   // could use some better error handling here, add that to techdebt
+  // } catch (error) {
+  //   console.log(error);
+  //   return response.status(400).json(error);
+  // }
 };
 
 const deleteUser = async (request, response) => {
@@ -175,7 +201,7 @@ const addUserFollowers = async (request, response) => {
             .execPopulate();
           return response.status(200).json({
             message: `User ${userToFollow} added successfully to ${currentUser}'s follower list`,
-            user,
+            followedAccounts: user.followedAccounts,
           });
         }
       }
@@ -203,7 +229,7 @@ const deleteUserFollower = async (request, response) => {
         .execPopulate();
       return response.status(200).json({
         message: `User ${userToUnfollow} added successfully to ${currentUser}'s follower list`,
-        user,
+        followedAccounts: user.followedAccounts,
       });
     }
   });
