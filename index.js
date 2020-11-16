@@ -16,7 +16,7 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "/")));
+app.use(express.static(path.join(__dirname)));
 
 //Connection to MongoDB
 
@@ -57,8 +57,12 @@ app.use((request, response, next) => {
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
 
-app.all("*", (request, response) => {
-  response.sendStatus(404);
+// app.all("*", (request, response) => {
+//   response.sendStatus(404);
+// });
+
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 const server = app.listen(process.env.PORT, () => {
