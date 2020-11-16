@@ -16,7 +16,7 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "client/build")));
+app.use(express.static(path.join(__dirname, "/")));
 
 //Connection to MongoDB
 
