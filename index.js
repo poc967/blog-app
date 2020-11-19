@@ -8,7 +8,9 @@ const postsRouter = require("./routers/posts");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const path = require("path");
 
+app.use(express.static(path.join(__dirname, "build")));
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -16,7 +18,6 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
 
 //Connection to MongoDB
 
@@ -57,12 +58,8 @@ app.use((request, response, next) => {
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
 
-// app.all("*", (request, response) => {
-//   response.sendStatus(404);
-// });
-
 app.get("/*", function (req, res) {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 const server = app.listen(process.env.PORT, () => {

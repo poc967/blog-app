@@ -20,7 +20,6 @@ const createPost = async (request, response) => {
 
   await Posts.create(newPost, async function (error, newPost) {
     if (error) {
-      console.log(error);
       return response.status(400).json(error);
     } else {
       const updatedNewPost = await Posts.populate(newPost, {
