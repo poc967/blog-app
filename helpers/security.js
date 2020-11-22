@@ -100,6 +100,7 @@ const authorizeUser = (request, response, next) => {
 };
 
 const clearToken = (request, response) => {
+  console.log(request);
   if (request.cookie) {
     return response
       .clearCookie("token")
