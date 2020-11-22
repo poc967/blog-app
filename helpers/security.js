@@ -100,7 +100,7 @@ const authorizeUser = (request, response, next) => {
 };
 
 const clearToken = (request, response) => {
-  if (request.headers.cookie) {
+  if (request.cookie) {
     return response
       .clearCookie("token")
       .status(200)
