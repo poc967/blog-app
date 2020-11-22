@@ -39,16 +39,12 @@ connection.on("error", (error) => {
 
 //-----------------------------------------------------
 
-// const corsOptions = {
-//   origin: "http://localhost:3000",
-//   optionsSuccessStatus: 200,
-// };
+const corsOptions = {
+  origin: "http://localhost:3000/",
+  optionsSuccessStatus: 200,
+};
 
 app.use(cors(corsOptions));
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
 app.use(
   session({
     secret: "secret",
