@@ -40,8 +40,7 @@ connection.on("error", (error) => {
 //-----------------------------------------------------
 
 const corsOptions = {
-  origin: "http://localhost:3000/",
-  optionsSuccessStatus: 200,
+  origin: "http://localhost:3000",
 };
 
 app.use(cors(corsOptions));
