@@ -55,7 +55,11 @@ const authenticateUser = async (request, response, next) => {
           async (err, token) => {
             if (err) throw err;
             return response
-              .cookie("token", token, { httpOnly: true, sameSite: "none" })
+              .cookie("token", token, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+              })
               .status(200)
               .json(
                 await User.findOne({ _id: user._id })
