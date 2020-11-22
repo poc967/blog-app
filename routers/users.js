@@ -23,7 +23,7 @@ usersRouter.get("/:identifier", getUserById);
 usersRouter.delete("/:identifier", deleteUser);
 usersRouter.patch("/:identifier", authorizeUser, updateUser);
 usersRouter.post("/login", authenticateUser);
-usersRouter.post("/logout", clearToken);
+usersRouter.get("/logout", clearToken);
 usersRouter.post("/search", authorizeUser, userSearch);
 usersRouter.post("/add_followers/:identifier", authorizeUser, addUserFollowers),
   usersRouter.post(
