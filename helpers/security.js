@@ -54,21 +54,18 @@ const authenticateUser = async (request, response, next) => {
           { expiresIn: 3600 },
           async (err, token) => {
             if (err) throw err;
-            return (
-              response
-                .cookie("token", token)
-                // .cookie("token", token, { httpOnly: true })
-                .status(200)
-                .json(
-                  await User.findOne({ _id: user._id })
-                    .select("-password")
-                    .populate({
-                      path: "followedAccounts",
-                      select: ["firstName", "lastName"],
-                    })
-                    .exec()
-                )
-            );
+            return response
+              .cookie("token", token, { httpOnly: true })
+              .status(200)
+              .json(
+                await User.findOne({ _id: user._id })
+                  .select("-password")
+                  .populate({
+                    path: "followedAccounts",
+                    select: ["firstName", "lastName"],
+                  })
+                  .exec()
+              );
           }
         );
       }

@@ -39,7 +39,12 @@ connection.on("error", (error) => {
 
 //-----------------------------------------------------
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://locahost:3000",
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(
   session({
     secret: "secret",

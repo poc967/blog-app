@@ -93,15 +93,16 @@ const updateUser = async (request, response) => {
     function (error, user) {
       if (key.includes("password")) {
         bcrypt.genSalt(10, async function (err, salt) {
-          bcrypt.hash(request.body.password, salt, async function (
-            error,
-            hash
-          ) {
-            if (error) throw new error();
-            user.password = hash;
-            user.save();
-            return response.status(200);
-          });
+          bcrypt.hash(
+            request.body.password,
+            salt,
+            async function (error, hash) {
+              if (error) throw new error();
+              user.password = hash;
+              user.save();
+              return response.status(200);
+            }
+          );
         });
       } else {
         user[key] = request.body[key];
