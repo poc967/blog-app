@@ -40,7 +40,7 @@ connection.on("error", (error) => {
 //-----------------------------------------------------
 
 const corsOptions = {
-  origin: "https://enigmatic-springs-23614.herokuapp.com/",
+  origin: "https://enigmatic-springs-23614.herokuapp.com",
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: true,
