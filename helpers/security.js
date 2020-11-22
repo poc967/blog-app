@@ -101,6 +101,7 @@ const authorizeUser = (request, response, next) => {
 
 const clearToken = (request, response) => {
   const token = request.cookies.token;
+  console.log(request);
 
   if (token) {
     return response
