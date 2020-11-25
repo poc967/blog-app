@@ -71,9 +71,9 @@ app.use((request, response, next) => {
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
 
-// app.get("/*", function (req, res) {
-//   res.sendFile(path.join(__dirname, "build", "index.html"));
-// });
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`Listening on port ${process.env.PORT}...`);
