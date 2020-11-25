@@ -43,8 +43,8 @@ const createUser = async (request, response, next) => {
               return response
                 .cookie("token", token, {
                   httpOnly: true,
-                  // sameSite: "none",
-                  // secure: true,
+                  sameSite: "none",
+                  secure: true,
                 })
                 .status(200)
                 .json(
