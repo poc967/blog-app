@@ -41,7 +41,11 @@ const createUser = async (request, response, next) => {
             async (err, token) => {
               if (err) throw err;
               return response
-                .cookie("token", token, { httpOnly: true })
+                .cookie("token", token, {
+                  httpOnly: true,
+                  // sameSite: "none",
+                  // secure: true,
+                })
                 .status(200)
                 .json(
                   userData.populate({

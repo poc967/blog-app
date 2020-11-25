@@ -28,19 +28,24 @@ mongoose.connect(process.env.URL, {
   useFindAndModify: false,
 });
 
-const connection = mongoose.connection;
-connection.once("open", () => {
-  console.log(`Database connected`);
-});
+if (process.env.NODE_ENV === "development") {
+  const connection = mongoose.connection;
+  connection.once("open", () => {
+    console.log(`Database connected`);
+  });
 
-connection.on("error", (error) => {
-  console.error("connection error:", error);
-});
+  connection.on("error", (error) => {
+    console.error("connection error:", error);
+  });
+}
 
 //-----------------------------------------------------
 
 const corsOptions = {
-  origin: "https://enigmatic-springs-23614.herokuapp.com",
+  origin:
+    process.env.NODE_ENV === "production"
+      ? "https://enigmatic-springs-23614.herokuapp.com"
+      : "http://localhost:3000",
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: true,
@@ -66,9 +71,9 @@ app.use((request, response, next) => {
 app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
 
-app.get("/*", function (req, res) {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
+// app.get("/*", function (req, res) {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`Listening on port ${process.env.PORT}...`);
