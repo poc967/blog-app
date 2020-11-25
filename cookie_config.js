@@ -1,2 +1,4 @@
-export const prodCookie = { httpOnly: true, sameSite: "none", secure: true };
-export const devCookie = { httpOnly: true };
+const prodCookie = { httpOnly: true, sameSite: "none", secure: true };
+const devCookie = { httpOnly: true };
+
+module.exports = { prodCookie, devCookie };
