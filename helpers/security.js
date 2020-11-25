@@ -26,11 +26,11 @@ const authenticateUser = async (request, response, next) => {
           async (err, token) => {
             if (err) throw err;
             return response
-              .cookie("token", token, {
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-              })
+              .cookie(
+                "token",
+                token,
+                process.env.NODE_ENV === "development" ? devCookie : prodCookie
+              )
               .status(200)
               .json(
                 await User.findOne({ _id: user._id })

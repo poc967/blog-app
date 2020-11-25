@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { param } = require("../routers/users");
 const { findById } = require("../models/users");
 const { request, response } = require("express");
-require("dotenv").config();
+const { prodCookie, devCookie } = require("../cookie_config");
 
 const createUser = async (request, response, next) => {
   const { firstName, lastName, email, password } = request.body;
@@ -41,11 +41,13 @@ const createUser = async (request, response, next) => {
             async (err, token) => {
               if (err) throw err;
               return response
-                .cookie("token", token, {
-                  httpOnly: true,
-                  sameSite: "none",
-                  secure: true,
-                })
+                .cookie(
+                  "token",
+                  token,
+                  process.env.NODE_ENV === "development"
+                    ? devCookie
+                    : prodCookie
+                )
                 .status(200)
                 .json(
                   userData.populate({
